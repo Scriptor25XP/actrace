@@ -11,19 +11,21 @@ export async function GET(request: Request) {
     const error = params.get("error");
 
     const code = params.get("code")!;
-    // const scope = params.get("scope")!;
+    const scope = params.get("scope")!;
+
+    console.log(`oauth callback: state='${state}', error='${error}', code='${code}', scope='${scope}'`);
 
     const storage = await cookies();
 
     if (error) {
-        console.log(error);
+        console.error(`oauth failed: ${error}`);
 
         storage.delete("access_token");
         storage.delete("expires_at");
         storage.delete("expires_in");
         storage.delete("refresh_token");
 
-        redirect("/");
+        return redirect("/");
     }
 
     const {
@@ -31,10 +33,12 @@ export async function GET(request: Request) {
         ...bundle
     } = await getOAuthToken(code);
 
-    if (athlete?.id)
+    if (athlete?.id) {
         storage.set("athlete_id", athlete.id.toString());
+    }
 
     await setBundleCookies(bundle);
 
-    redirect(state ?? "/");
+    console.log(`oauth successfull`);
+    return redirect(state ?? "/");
 }

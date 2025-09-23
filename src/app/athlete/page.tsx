@@ -12,7 +12,7 @@ import styles from "./page.module.scss";
 export default async function Page() {
     const bundle = await getBundleCookies();
     if (!bundle) {
-        redirect("/");
+        return redirect("/");
     }
 
     async function handleClick() {
@@ -20,7 +20,7 @@ export default async function Page() {
 
         if (bundle) {
             await deauthorizeOAuth(bundle.access_token);
-            redirect("/");
+            return redirect("/");
         }
     }
 

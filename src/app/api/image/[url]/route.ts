@@ -2,8 +2,8 @@ type Params = {
     url: string,
 }
 
-export async function GET(request: Request, {params}: { params: Promise<Params> }) {
-    const {url} = await params;
+export async function GET(request: Request, { params }: { params: Promise<Params> }) {
+    const { url } = await params;
 
     const response = await fetch(url, request);
 
