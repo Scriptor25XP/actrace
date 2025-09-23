@@ -1,0 +1,29 @@
+.header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: var(--space-l);
+    z-index: 2;
+
+    background: #efefef;
+    box-shadow: var(--box-shadow);
+}
+
+.title {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.navigation {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.profile {
+    border-radius: 50%;
+    border: 1px solid black;
+}

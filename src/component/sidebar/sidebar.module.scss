@@ -1,0 +1,16 @@
+ul.container {
+    display: flex;
+    flex-flow: column nowrap;
+
+    gap: var(--space-s);
+
+    background: #efefef;
+    box-shadow: var(--box-shadow);
+    z-index: 1;
+
+    width: 250px;
+    margin: 0;
+    padding: var(--space-l);
+
+    list-style: none;
+}
