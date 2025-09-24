@@ -1,3 +1,4 @@
+import { VercelKV, createClient } from "@vercel/kv";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import "server-only";
@@ -30,28 +31,20 @@ class RowReference<T> {
 
 class Storage<T> {
 
-    static async open<T>(key: string, callback: (storage: Storage<T>) => Promise<void>) {
-        const storage = new Storage<T>(key);
+    static async open<S extends Storage<T>, T>(key: string, callback: (storage: Storage<T>) => Promise<void>, ctor: new (key: string) => S) {
+        const storage = new ctor(key);
+        await storage.load();
         await callback(storage);
-        storage.sync();
+        await storage.store();
     }
 
-    private readonly values: T[];
+    protected readonly values: T[] = [];
 
-    constructor(private readonly key: string) {
-        this.values = [];
-        if (existsSync(this.filename)) {
-            const json = readFileSync(this.filename, "utf-8");
-            this.values = JSON.parse(json);
-        }
+    protected constructor(protected readonly key: string) {
     }
 
-    private get filename() { return path.join(process.cwd(), `${this.key}.storage.json`); }
-
-    private sync() {
-        const json = JSON.stringify(this.values, null, 2);
-        writeFileSync(this.filename, json);
-    }
+    protected async load(): Promise<void> { }
+    protected async store(): Promise<void> { }
 
     row(index: number): RowReference<T> {
         const inbounds = 0 <= index && index < this.values.length;
@@ -89,6 +82,59 @@ class Storage<T> {
     }
 }
 
-export async function storage<T>(key: string, callback: (storage: Storage<T>) => Promise<void>) {
-    await Storage.open<T>(key, callback);
+class JsonStorage<T> extends Storage<T> {
+
+    private get filename() { return path.join(process.cwd(), `${this.key}.storage.json`); }
+
+    constructor(key: string) {
+        super(key);
+    }
+
+    async load(): Promise<void> {
+        if (existsSync(this.filename)) {
+            const json = readFileSync(this.filename, "utf-8");
+            this.values.splice(0, this.values.length, ...JSON.parse(json));
+        }
+    }
+
+    async store(): Promise<void> {
+        const json = JSON.stringify(this.values, undefined, 2);
+        writeFileSync(this.filename, json);
+    }
+}
+
+class KVStorage<T> extends Storage<T> {
+
+    private readonly client: VercelKV;
+
+    constructor(key: string) {
+        super(key);
+
+        this.client = createClient({
+            url: process.env.KV_REST_API_URL,
+            token: process.env.KV_REST_API_TOKEN,
+        });
+    }
+
+    async load(): Promise<void> {
+        const data = await this.client.get<T[]>(this.key);
+        if (data !== null) {
+            this.values.splice(0, this.values.length, ...data);
+        }
+    }
+
+    async store(): Promise<void> {
+        await this.client.set(this.key, this.values);
+    }
+}
+
+export async function storage<T>(service: "json" | "kv", key: string, callback: (storage: Storage<T>) => Promise<void>) {
+    switch (service) {
+        case "json":
+            await Storage.open(key, callback, JsonStorage);
+            break;
+        case "kv":
+            await Storage.open(key, callback, KVStorage);
+            break;
+    }
 }

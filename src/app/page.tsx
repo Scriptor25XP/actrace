@@ -9,7 +9,7 @@ type WebhookEntity = {
 async function handleCreate() {
     "use server";
 
-    await storage<WebhookEntity>("webhook", async storage => {
+    await storage<WebhookEntity>("kv", "webhook", async storage => {
         const id = await createWebhook(`${process.env.BASE_URI}/api/webhook`, process.env.VERIFY_TOKEN!);
         console.log(`create webhook id=${id}`);
 
@@ -20,7 +20,7 @@ async function handleCreate() {
 async function handleDelete() {
     "use server";
 
-    await storage<WebhookEntity>("webhook", async storage => {
+    await storage<WebhookEntity>("kv", "webhook", async storage => {
         const row = storage.row(0);
         const id = row.ref("id");
 
