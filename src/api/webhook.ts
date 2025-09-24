@@ -1,3 +1,4 @@
+import { Webhook } from "@/type/strava";
 import "server-only";
 import { fetchAPI } from "./fetch";
 
@@ -18,7 +19,7 @@ export async function createWebhook(callback_url: string, verify_token: string) 
     return payload.id;
 }
 
-export async function getWebhooks() {
+export async function getWebhooks(): Promise<Webhook[]> {
     const params = new URLSearchParams();
     params.set("client_id", process.env.CLIENT_ID!);
     params.set("client_secret", process.env.CLIENT_SECRET!);

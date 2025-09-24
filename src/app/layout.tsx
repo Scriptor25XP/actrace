@@ -6,14 +6,17 @@ import { Sidebar } from "@/component/sidebar/sidebar";
 import { StravaProvider } from "@/component/strava-provider/strava-provider";
 import { DetailedAthlete } from "@/type/strava";
 import { getBundleCookies } from "@/util/cookies";
-import "@fortawesome/fontawesome-svg-core/styles";
 import { faStrava } from "@fortawesome/free-brands-svg-icons";
 import { faBars, faChartLine, faChartSimple, faEnvelopeOpen, faFolderOpen, faListCheck, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import type { Metadata } from "next";
 import { Fira_Sans } from "next/font/google";
 import { ReactNode } from "react";
-import "./globals.scss";
+
 import styles from "./layout.module.scss";
+
+import { ErrorBoundary } from "@/component/error-boundary/error-boundary";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import "./globals.scss";
 
 const font = Fira_Sans({
     subsets: ["latin", "latin-ext"],
@@ -53,7 +56,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                             { href: "/faq", icon: faQuestion, title: "FAQ" },
                             { href: "/about", icon: faBars, title: "About" },
                         ]}</Sidebar>
-                        <main>{children}</main>
+                        <ErrorBoundary>
+                            <main>{children}</main>
+                        </ErrorBoundary>
                     </div>
                     <Footer />
                 </StravaProvider>
