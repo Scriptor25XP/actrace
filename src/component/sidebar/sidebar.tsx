@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import styles from "./sidebar.module.scss";
 
-type Entry = {
+interface Entry {
     icon: IconProp,
     title: string,
     href: string,
 }
 
-type Props = {
+interface Props {
     children?: Entry[],
 }
 

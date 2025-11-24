@@ -1,4 +1,4 @@
-type Props<T> = {
+interface Props<T> {
     data: T,
 };
 

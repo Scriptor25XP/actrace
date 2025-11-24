@@ -1,23 +1,20 @@
+import { cookies } from "next/headers";
 import "server-only";
-import {cookies} from "next/headers";
 
-export type OAuthTokenBundle = {
+export interface OAuthTokenBundle {
     access_token: string,
     expires_at: number,
     expires_in: number,
     refresh_token: string,
 }
 
-export async function getBundleCookies(): Promise<OAuthTokenBundle | undefined> {
+export async function getBundleCookies(): Promise<OAuthTokenBundle | null> {
     const storage = await cookies();
 
     if (storage.has("access_token")
         && storage.has("expires_at")
         && storage.has("expires_in")
         && storage.has("refresh_token")) {
-
-        if (Number.parseInt(storage.get("expires_at")!.value) * 1000 <= Date.now())
-            return undefined;
 
         return {
             access_token: storage.get("access_token")!.value,
@@ -27,18 +24,18 @@ export async function getBundleCookies(): Promise<OAuthTokenBundle | undefined> 
         };
     }
 
-    return undefined;
+    return null;
 }
 
-export async function setBundleCookies({access_token, expires_at, expires_in, refresh_token}: OAuthTokenBundle) {
+export async function setBundleCookies({ access_token, expires_at, expires_in, refresh_token }: OAuthTokenBundle) {
     const storage = await cookies();
 
-    storage.set("access_token", access_token, {expires: expires_at * 1000});
-    storage.set("expires_at", expires_at.toString());
-    storage.set("expires_in", expires_in.toString());
+    storage.set("access_token", access_token, { expires: expires_at * 1000 });
+    storage.set("expires_at", `${expires_at}`);
+    storage.set("expires_in", `${expires_in}`);
 
     if (storage.get("refresh_token")?.value !== refresh_token) {
-        storage.set("refresh_token", refresh_token, {maxAge: 3600 * 6});
+        storage.set("refresh_token", refresh_token, { maxAge: 3600 * 6 });
     }
 }
 

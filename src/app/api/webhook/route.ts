@@ -1,11 +1,21 @@
+import { EventData } from "@/type/strava";
+import { storage } from "@/util/storage";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
 
-    const payload = await request.json();
+    const payload: EventData = await request.json();
+
+    await storage<EventData>("kv", "event", async storage => {
+        storage.insert(payload);
+    });
 
     console.log("webhook payload:");
     console.dir(payload, { depth: null });
+
+    revalidateTag(`${payload.object_type}:${payload.object_id}`);
+    revalidateTag(payload.object_type);
 
     return NextResponse.json({}, { status: 200, statusText: "OK" });
 }

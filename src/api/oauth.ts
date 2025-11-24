@@ -1,7 +1,7 @@
+import { fetchAPI } from "@/api/fetch";
+import { DetailedAthlete } from "@/type/strava";
+import { OAuthTokenBundle, clearBundleCookies } from "@/util/cookies";
 import "server-only";
-import {fetchAPI} from "@/api/fetch";
-import {DetailedAthlete} from "@/type/strava";
-import {clearBundleCookies, OAuthTokenBundle} from "@/util/cookies";
 
 export type OAuthScope =
     "read"
@@ -17,7 +17,7 @@ export type OAuthResponse = OAuthTokenBundle & {
     athlete?: DetailedAthlete,
 }
 
-type OptionalParams = {
+interface OptionalParams {
     approvalPrompt?: boolean,
     state?: string,
 }
@@ -40,7 +40,7 @@ export async function deauthorizeOAuth(accessToken: string) {
     const params = new URLSearchParams();
     params.set("access_token", accessToken);
 
-    await fetch(`${process.env.OAUTH_ENDPOINT}/deauthorize?${params}`, {method: "POST"});
+    await fetch(`${process.env.OAUTH_ENDPOINT}/deauthorize?${params}`, { method: "POST" });
     await clearBundleCookies();
 }
 

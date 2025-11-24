@@ -33,18 +33,30 @@ class Storage<T> {
 
     static async open<S extends Storage<T>, T>(key: string, callback: (storage: Storage<T>) => Promise<void>, ctor: new (key: string) => S) {
         const storage = new ctor(key);
+
         await storage.load();
         await callback(storage);
-        await storage.store();
+        if (storage.modified) {
+            await storage.store();
+        }
     }
 
-    protected readonly values: T[] = [];
+    protected readonly values: { value: T, created: boolean, updated: boolean }[] = [];
+    protected deleted: boolean = false;
+
+    protected get modified(): boolean {
+        return this.deleted || this.values.some(entry => entry.created || entry.updated);
+    }
 
     protected constructor(protected readonly key: string) {
     }
 
-    protected async load(): Promise<void> { }
-    protected async store(): Promise<void> { }
+    protected async load(): Promise<void> {
+        return;
+    }
+    protected async store(): Promise<void> {
+        return;
+    }
 
     row(index: number): RowReference<T> {
         const inbounds = 0 <= index && index < this.values.length;
@@ -55,6 +67,7 @@ class Storage<T> {
             () => exists,
             () => {
                 if (exists) {
+                    this.deleted ||= !this.values[index].created;
                     this.values.splice(index, 1);
                     exists = false;
                     return true;
@@ -63,13 +76,14 @@ class Storage<T> {
             },
             (key) => {
                 if (exists) {
-                    return this.values[index][key];
+                    return this.values[index].value[key];
                 }
                 throw new Error("row does not exits");
             },
             (key, value) => {
                 if (exists) {
-                    this.values[index][key] = value;
+                    this.values[index].updated = true;
+                    this.values[index].value[key] = value;
                     return;
                 }
                 throw new Error("row does not exits");
@@ -77,7 +91,7 @@ class Storage<T> {
     }
 
     insert(value: T): RowReference<T> {
-        const len = this.values.push(value);
+        const len = this.values.push({ value, created: true, updated: false });
         return this.row(len - 1);
     }
 }
@@ -93,7 +107,8 @@ class JsonStorage<T> extends Storage<T> {
     async load(): Promise<void> {
         if (existsSync(this.filename)) {
             const json = readFileSync(this.filename, "utf-8");
-            this.values.splice(0, this.values.length, ...JSON.parse(json));
+            const data: T[] = JSON.parse(json);
+            this.values.splice(0, this.values.length, ...data.map(value => ({ value, created: false, updated: false })));
         }
     }
 
@@ -119,7 +134,7 @@ class KVStorage<T> extends Storage<T> {
     async load(): Promise<void> {
         const data = await this.client.get<T[]>(this.key);
         if (data !== null) {
-            this.values.splice(0, this.values.length, ...data);
+            this.values.splice(0, this.values.length, ...data.map(value => ({ value, created: false, updated: false })));
         }
     }
 

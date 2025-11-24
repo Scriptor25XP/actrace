@@ -1,4 +1,4 @@
-type Params = {
+interface Params {
     url: string,
 }
 
