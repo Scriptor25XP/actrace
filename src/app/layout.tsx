@@ -13,6 +13,8 @@ import { DetailedAthlete } from "@/type/strava";
 import { faStrava } from "@fortawesome/free-brands-svg-icons";
 import { faBars, faChartLine, faChartSimple, faEnvelopeOpen, faFolderOpen, faListCheck, faQuestion } from "@fortawesome/free-solid-svg-icons";
 
+import { Analytics } from "@vercel/analytics/next";
+
 import type { Metadata } from "next";
 import { Fira_Sans } from "next/font/google";
 
@@ -61,6 +63,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                     </div>
                     <Footer />
                 </StravaProvider>
+                <Analytics />
             </body>
         </html>
     );
