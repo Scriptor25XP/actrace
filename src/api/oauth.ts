@@ -1,7 +1,10 @@
-import { fetchAPI } from "@/api/fetch";
-import { DetailedAthlete } from "@/type/strava";
-import { OAuthTokenBundle, clearBundleCookies } from "@/util/cookies";
 import "server-only";
+
+import { fetchAPI } from "@/api/fetch";
+
+import { DetailedAthlete } from "@/type/strava";
+
+import { OAuthTokenBundle, clearBundleCookies } from "@/util/cookies";
 
 export type OAuthScope =
     "read"

@@ -1,6 +1,8 @@
-import { getRefreshToken } from "@/api/oauth";
-import { getBundleCookies, setBundleCookies } from "@/util/cookies";
 import "server-only";
+
+import { getRefreshToken } from "@/api/oauth";
+
+import { getBundleCookies, setBundleCookies } from "@/util/cookies";
 
 export async function fetchAPI(resource: string, init?: RequestInit) {
     let bundle = await getBundleCookies();
@@ -34,7 +36,11 @@ export async function fetchAPI(resource: string, init?: RequestInit) {
     return response;
 }
 
-export async function fetchEntity<T>(resource: string, init?: RequestInit): Promise<T> {
-    const response = await fetchAPI(resource, init);
-    return response.json();
+export async function fetchEntity<T>(resource: string, init?: RequestInit): Promise<T | null> {
+    try {
+        const response = await fetchAPI(resource, init);
+        return response.json();
+    } catch {
+        return null;
+    }
 }

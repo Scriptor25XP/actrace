@@ -1,9 +1,11 @@
 import { EventData } from "@/type/strava";
+
 import { storage } from "@/util/storage";
+
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const payload: EventData = await request.json();
 
@@ -14,10 +16,10 @@ export async function POST(request: NextRequest) {
     console.log("webhook payload:");
     console.dir(payload, { depth: null });
 
-    revalidateTag(`${payload.object_type}:${payload.object_id}`);
-    revalidateTag(payload.object_type);
+    revalidateTag(`${payload.object_type}:${payload.object_id}`, {});
+    revalidateTag(payload.object_type, {});
 
-    return NextResponse.json({}, { status: 200, statusText: "OK" });
+    return new NextResponse(null, { status: 200, statusText: "OK" });
 }
 
 export async function GET(request: NextRequest) {
@@ -28,12 +30,12 @@ export async function GET(request: NextRequest) {
 
     if (mode !== "subscribe") {
         console.error(`webhook validation failed: mode '${mode}' does not match expected value 'subscribe'`);
-        return new NextResponse(undefined, { status: 400, statusText: "Bad Request" });
+        return new NextResponse(null, { status: 400, statusText: "Bad Request" });
     }
 
     if (verify_token !== process.env.VERIFY_TOKEN) {
         console.error(`webhook validation failed: verify_token '${verify_token}' does not match expected value '${process.env.VERIFY_TOKEN}'`);
-        return new NextResponse(undefined, { status: 401, statusText: "Unauthorized" });
+        return new NextResponse(null, { status: 401, statusText: "Unauthorized" });
     }
 
     console.log("webhook validation successfull");

@@ -1,17 +1,15 @@
-interface Params {
-    url: string,
-}
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: Promise<Params> }) {
-    const { url } = await params;
+export async function GET(request: NextRequest, context: RouteContext<"/api/image/[url]">): Promise<NextResponse> {
+    const { url } = await context.params;
 
     const response = await fetch(url, request);
 
-    const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "public, max-age=31536000, immutable");
-
-    return new Response(response.body, {
-        headers,
+    return new NextResponse(response.body, {
+        headers: {
+            "Content-Type": response.headers.get("Content-Type") ?? "image/*",
+            "Cache-Control": "public, max-age=31536000, immutable",
+        },
         status: response.status,
         statusText: response.statusText,
     });

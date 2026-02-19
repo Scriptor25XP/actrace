@@ -1,7 +1,8 @@
 "use client";
 
+import { JsonView } from "@/component/json-view/json-view";
+
 import { Component, ErrorInfo, PropsWithChildren, ReactNode } from "react";
-import { JsonView } from "../json-view/json-view";
 
 type State = { is: false, } | { is: true, payload: Error }
 

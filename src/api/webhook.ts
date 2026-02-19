@@ -1,6 +1,8 @@
-import { Webhook } from "@/type/strava";
 import "server-only";
-import { fetchAPI } from "./fetch";
+
+import { fetchAPI } from "@/api/fetch";
+
+import { Webhook } from "@/type/strava";
 
 export async function createWebhook(callback_url: string, verify_token: string) {
     const data = new FormData();

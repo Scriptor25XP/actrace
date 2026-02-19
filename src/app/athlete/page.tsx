@@ -1,12 +1,18 @@
-import { fetchRestrictedAPI } from "@/api/fetch";
+import { fetchEntity } from "@/api/fetch";
 import { deauthorizeOAuth } from "@/api/oauth";
+
 import { AvatarProfile } from "@/component/avatar-profile/avatar-profile";
+
 import { DetailedAthlete } from "@/type/strava";
+
 import { getBundleCookies } from "@/util/cookies";
+
 import { faStar as faStarR } from "@fortawesome/free-regular-svg-icons";
 import { faStar as faStarS } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { redirect } from "next/navigation";
+
+import { notFound, redirect } from "next/navigation";
+
 import styles from "./page.module.scss";
 
 export default async function Page() {
@@ -24,8 +30,10 @@ export default async function Page() {
         }
     }
 
-    const response = await fetchRestrictedAPI("athlete", bundle);
-    const athlete: DetailedAthlete = await response.json();
+    const athlete = await fetchEntity<DetailedAthlete>("athlete");
+    if (!athlete) {
+        notFound();
+    }
 
     return (
         <div className={styles.content}>

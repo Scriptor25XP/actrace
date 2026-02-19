@@ -2,8 +2,11 @@
 
 import { AvatarProfile } from "@/component/avatar-profile/avatar-profile";
 import { StravaContext } from "@/component/strava-provider/strava-provider";
+
 import Link from "next/link";
+
 import { useContext } from "react";
+
 import styles from "./header.module.scss";
 
 export function Header() {

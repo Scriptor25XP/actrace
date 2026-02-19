@@ -1,5 +1,7 @@
 import { fetchEntity } from "@/api/fetch";
+
 import { ActivityStats, ClubActivity, ClubAthlete, DetailedActivity, DetailedAthlete, DetailedClub, DetailedGear, Lap, Route, SummaryAthlete, SummaryClub, Zones } from "@/type/strava";
+
 import { unstable_cache } from "next/cache";
 
 const DAILY = 86400 as const;

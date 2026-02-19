@@ -1,9 +1,12 @@
 import { getOAuthToken } from "@/api/oauth";
-import { setBundleCookies } from "@/util/cookies";
-import { cookies } from "next/headers";
-import { ReadonlyURLSearchParams, redirect } from "next/navigation";
 
-export async function GET(request: Request) {
+import { setBundleCookies } from "@/util/cookies";
+
+import { cookies } from "next/headers";
+import { ReadonlyURLSearchParams } from "next/navigation";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
 
     const params = new ReadonlyURLSearchParams(request.url);
 
@@ -25,7 +28,7 @@ export async function GET(request: Request) {
         storage.delete("expires_in");
         storage.delete("refresh_token");
 
-        return redirect("/");
+        return NextResponse.redirect(process.env.BASE_URI!);
     }
 
     const {
@@ -40,5 +43,5 @@ export async function GET(request: Request) {
     await setBundleCookies(bundle);
 
     console.log(`oauth successfull`);
-    return redirect(state ?? "/");
+    return NextResponse.redirect(state ?? process.env.BASE_URI!);
 }

@@ -1,20 +1,25 @@
-import { fetchRestrictedAPI } from "@/api/fetch";
+import { fetchEntity } from "@/api/fetch";
 import { getOAuthURI } from "@/api/oauth";
+
+import { ErrorBoundary } from "@/component/error-boundary/error-boundary";
 import { Footer } from "@/component/footer/footer";
 import { Header } from "@/component/header/header";
 import { Sidebar } from "@/component/sidebar/sidebar";
 import { StravaProvider } from "@/component/strava-provider/strava-provider";
+
 import { DetailedAthlete } from "@/type/strava";
-import { getBundleCookies } from "@/util/cookies";
+
+
 import { faStrava } from "@fortawesome/free-brands-svg-icons";
 import { faBars, faChartLine, faChartSimple, faEnvelopeOpen, faFolderOpen, faListCheck, faQuestion } from "@fortawesome/free-solid-svg-icons";
+
 import type { Metadata } from "next";
 import { Fira_Sans } from "next/font/google";
+
 import { ReactNode } from "react";
 
 import styles from "./layout.module.scss";
 
-import { ErrorBoundary } from "@/component/error-boundary/error-boundary";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "./globals.scss";
 
@@ -30,13 +35,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
 
-    const bundle = await getBundleCookies();
-
-    let athlete: DetailedAthlete | null = null;
-    if (bundle) {
-        const response = await fetchRestrictedAPI("athlete", bundle);
-        athlete = await response.json();
-    }
+    const athlete = await fetchEntity<DetailedAthlete>("athlete");
 
     const oauthURI = await getOAuthURI(["read", "read_all"], { state: "/athlete" });
 

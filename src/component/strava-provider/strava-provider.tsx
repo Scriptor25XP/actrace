@@ -1,6 +1,7 @@
 "use client";
 
 import { DetailedAthlete } from "@/type/strava";
+
 import { PropsWithChildren, createContext } from "react";
 
 interface Props {
